@@ -1,0 +1,156 @@
+{% extends 'products/base.html' %}
+{% load humanize %}
+{% load static %}
+{% load filtertags %}
+{% block title %} "{{ request.GET.q }}" | CONNECT Search {% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <br>
+    {% if submitbutton == 'Search' and request.GET.q != '' %}
+    {% if result_user or result_product %}
+
+    <h3 class="mt-2">Results for <strong>"{{ request.GET.q }}"</strong></h3>
+    <br>
+
+    {% if result_product|length > 0 %}
+    <div class="row p-2">
+        {% for product in result_product %}
+        <div class="col-lg-3 col-md-4 col-sm-4 col-6">
+            <style>
+                .col-6 {
+                    padding: 6px;
+                }
+            </style>
+            <a href="{{ product.get_absolute_url }}">
+                {% if product.productimage_set.all %}
+
+                {% for product_image in product.productimage_set.all %}
+                {% if forloop.first %}
+                <img src="{{ product_image.image.url }}" fill="777" background="#777" color="#777" alt=""
+                     class="thumbnail-product">
+                {% endif %}
+
+                {% endfor %}
+
+                {% else %}
+                <img src="{{ product.image.url }}" fill="777" background="#777" color="#777" alt=""
+                     class="thumbnail-product">
+                {% endif %}
+                <style>
+                    .thumbnail-product{
+                        width: 100%;
+                        height: 300px;
+                    }
+
+                </style>
+            </a>
+
+            <div class="card p-2">
+                <a href="{{ product.get_absolute_url }}" class="text-dark text-decoration-none">
+                    <h6 class="mb-2 mt-2 text-truncate">{{ product.name }}</h6>
+                    <p class="fs--1">
+                        {% for i in product.rating_count|times %}
+                        <span class="fa fa-star checked text-warning"></span>
+                        {% endfor %}
+                        {% for i in product.rating_count|times_minus %}
+                        <span class="fa fa-star"></span>
+                        {% endfor %}
+                        <span class="text-500 text-grey fw-semi-bold ms-1">
+                                    ({{product.productreview_set.count}} people rated)</span>
+                    </p>
+                    <style>
+                        .fw-semi-bold {
+                            font-weight: 500 !important;
+                            color: grey !important;
+                        }
+                    </style>
+                    <div class="media">
+                        <h5 class="mt-1"><b>₦{{ product.price|floatformat:2|intcomma }}</b></h5>
+                        <div class="media-body ">
+                            <div class="float-right  badge badge-warning alert alert-warning py-2">
+                                <svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-download"
+                                     fill="currentColor"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                          d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                    <path fill-rule="evenodd"
+                                          d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                </svg>
+                                <strong class="ml-2"> {{ product.product_purchase }} </strong> sales
+                            </div>
+                        </div>
+                    </div>
+
+                </a>
+
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <br>
+    <div align="center" class="failed_search">
+        <svg xmlns="http://www.w3.org/2000/svg" width="10rem" height="10rem" fill="currentColor"
+             class="bi bi-search"
+             viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+        </svg>
+        <h3><b>We didn't find any results for your search: "{{ request.GET.q }}".</b></h3>
+        <h5>To find what you need, simply check the spelling of your typed search and try again.</h5>
+        <a href="javascript:history.go(-1)" class="btn btn-lg">
+            GO BACK?
+        </a>
+
+    </div>
+    {% endif %}
+
+
+    {% else %}
+    <div align="center" class="failed_search">
+        <svg xmlns="http://www.w3.org/2000/svg" width="10rem" height="10rem" fill="currentColor" class="bi bi-search"
+             viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+        </svg>
+        <h3><b>We didn't find any results for your search: "{{ request.GET.q }}".</b></h3>
+        <h5>To find what you need, simply check the spelling of your typed search and try again.</h5>
+        <a href="javascript:history.go(-1)" class="btn btn-lg">
+            GO BACK?
+        </a>
+
+    </div>
+    <style>
+        .failed_search{
+            display: block;
+            align-items: center;
+            text-align: center;
+            height: 50vh;
+            margin-top: 5rem;
+        }
+        .badge-warning, .alert-warning {
+            background: #bcac76 !important;
+            color: #000 !important;
+        }
+    </style>
+
+    {% endif %}
+    {% else %}
+    <div align="center" class="failed_search">
+        <svg xmlns="http://www.w3.org/2000/svg" width="10rem" height="10rem" fill="currentColor" class="bi bi-search"
+             viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+        </svg>
+        <h3><b>We didn't find any results for your search: "{{ request.GET.q }}".</b></h3>
+        <h5>To find what you need, simply check the spelling of your typed search and try again.</h5>
+        <a href="javascript:history.go(-1)" class="btn btn-lg">
+            GO BACK?
+        </a>
+
+    </div>
+    {% endif %}
+</div>
+
+
+{% endblock %}

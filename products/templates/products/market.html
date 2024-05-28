@@ -1,0 +1,777 @@
+{% extends 'products/base.html' %}
+{% block title %}Market{% endblock %}
+{% load static %}
+{% load humanize %}
+{% load filtertags %}
+{% block content %}
+<style>
+    .section {
+       background: #bcac76;
+       border-color: #bcac76;
+       color: #fff;
+       position: relative;
+
+    }
+    .search-category {
+         position: absolute;
+         top: 200px;
+         width: 73%;
+         background-color: #fff;
+    }
+
+</style>
+<div class="section">
+    <div class="container py-5 mt-1">
+        <h3><b>Market Category</b></h3>
+    </div>
+</div>
+<div class="container">
+    <div class="search-category">
+        <div class="box-element">
+            <div class="row">
+                <div class="col">
+                    <form action="{% url 'search' %}" class="d-flex" autocomplete="off" method="GET"
+                          value="{{request.GET.q}}">
+                        <input style="width: 59rem" type="text" name="q" value="{{request.GET.q}}" class="form-control"
+                               placeholder="What product are you looking for today?"/>
+                        <div class="autocomplete" style="width:300px; display:none;">
+                            <input type="submit" name="submit" value="Search"/>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-auto">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Sort by
+                        </button>
+                        <script>
+                            $(".dropdown-toggle").click(function(){
+                              $(".dropdown-menu-list").toggle();
+                            });
+
+                        </script>
+                        <ul class="dropdown-menu-list dropdown-menu"
+                            style="position: absolute; inset: 0px 0px auto auto; margin: 0px;
+                                     transform: translate(0px, 31px);width:12rem"
+                            aria-labelledby="dropdownMenuButton1">
+                            <li><a class="dropdown-item" href="/products/">All Product</a>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" onclick="ajax_high_low_price_products_function('-price')">
+                                    High to low price
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" onclick="ajax_recent_products_function('-date_posted')">
+                                    Recent
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br><br><br>
+<div class="container">
+    {% if products|length > 0 %}
+    <div class="row p-2">
+        <div class="col-lg-3 col-md-3">
+            <div class="sticky-top" style="top: 110px">
+                <div class="box-element">
+                    <h5><b>Categories</b></h5>
+                    <hr>
+                    {% for category in categories %}
+                    <h6><a class="list-item my-1 text-dark "
+                           href="/products/?category_id={{ category.id }}">{{ category }}</a></h6>
+                    <hr>
+                    {% endfor %}
+
+                    <br>
+                    <h5><b>Price Range</b></h5>
+                    <hr>
+                    <form value="{{request.GET.min_price}}&{{request.GET.max_price}}" method="get">
+                        <div class="range_container">
+                            <div class="sliders_control">
+                                <input id="fromSlider" type="range" name="min_price"
+                                       value="{% if request.GET.min_price %}{{request.GET.min_price}}{% else %}10{% endif %}"
+                                       min="0" max="{{maximum_price.price__max}}"/>
+                                <input id="toSlider" type="range" name="max_price"
+                                       value="{% if request.GET.max_price %}{{request.GET.max_price}}{% else %}{{half_max_price}}{% endif %}"
+                                       min="0" max="{{maximum_price.price__max}}"/>
+                            </div>
+                            <div class="form_control">
+                                <div class="form_control_container">
+                                    <div class="form_control_container__time"><b>Min Price</b></div>
+                                    <input class="form_control_container__time__input" type="number" name="min_price"
+                                           id="fromInput"
+                                           value="{% if request.GET.min_price %}{{request.GET.min_price}}{% else %}10{% endif %}"
+                                           min="0" max="{{maximum_price.price__max}}"/>
+                                </div>
+                                <div class="form_control_container">
+                                    <div class="form_control_container__time"><b>Max Price</b></div>
+                                    <input class="form_control_container__time__input" name="max_price" type="number"
+                                           id="toInput"
+                                           value="{% if request.GET.max_price %}{{request.GET.max_price}}{% else %}{{half_max_price}}{% endif %}"
+                                           min="0" max="{{maximum_price.price__max}}"/>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="autocomplete">
+                                <input type="submit" class="btn btn-block" name="range-value" value="Search"/>
+                            </div>
+                        </div>
+                    </form>
+                    <br>
+                    <!-- Title -->
+                    <h5><b>Filter by Ratings</b></h5>
+                    <hr>
+                    <!-- Rating Star group -->
+                    <ul class="list-inline mb-0 g-3">
+                        <!-- Item -->
+                        {% if rating_query %}
+                        {% for i in 5|times %}
+                        <li class="list-inline-item mb-0">
+                            {% if rating_query|actual_value == forloop.counter %}
+                            <a class="btn-sm text-decoration-none btn-info"
+                               href="/products/?ratings={{forloop.counter}}">
+                                {{ forloop.counter }}
+                                <i class="fa fa-star text-warning"></i>
+                            </a>
+                            {% elif forloop.counter > rating_query|add:'-5' and forloop.counter < rating_query|add:'5'
+                            %}
+                            <a href="/products/?ratings={{forloop.counter}}"
+                               class="btn-outline-info text-decoration-none btn-sm btn-light">
+                                {{forloop.counter}}
+                                <i class="fa fa-star "></i>
+                            </a>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                        {% else %}
+                        {% for i in 5|times %}
+                        <li class="list-inline-item mb-0">
+                            <a href="/products/?ratings={{forloop.counter}}" class="btn-outline-info btn-sm btn-light">
+                                {{forloop.counter}}
+                                <i class="fa fa-star "></i>
+                            </a>
+                        </li>
+                        {% endfor %}
+                        {% endif %}
+                    </ul>
+                    <br>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-9 col-md-9">
+
+            <div class="market-started p-4">
+                <div class="market-get-started container">
+                    <h3><b> Easily find the <i>Product</i> needed to get your fashion/style
+                        <i>running</i>.</b></h3>
+                </div>
+            </div>
+
+            <br>
+            <div class="row" id="products-list">
+                {% for product in products %}
+                <div class="col-lg-4 col-md-6  mb-2 col-6">
+                    <style>
+                        .col-6 {
+                            padding: 6px;
+                        }
+                    </style>
+                    <a href="{{ product.get_absolute_url }}">
+                        {% if product.productimage_set.all %}
+
+                        {% for product_image in product.productimage_set.all %}
+                        {% if forloop.first %}
+
+                        <div class="single-testimonial text-center">
+                            <img loading="lazy" src="{{ product_image.image.url }}" fill="777" background="#777"
+                                 color="#777" alt=""
+                                 class="thumbnail-product">
+                        </div>
+                        {% endif %}
+
+                        {% endfor %}
+
+                        {% else %}
+                        <img src="{{ product.image.url }}" alt=""
+                             class="thumbnail-product">
+                        {% endif %}
+
+                    </a>
+
+                    <div class="card p-2">
+                        <a href="{{ product.get_absolute_url }}" class="text-dark text-decoration-none">
+                            <h6 class="mb-2 mt-2 text-truncate">{{ product.name }}</h6>
+                            <p class="fs--1">
+                                {% for i in product.rating_count|times %}
+                                <span class="fa fa-star checked text-warning"></span>
+                                {% endfor %}
+                                {% for i in product.rating_count|times_minus %}
+                                <span class="fa fa-star"></span>
+                                {% endfor %}
+                                <span class="text-500 text-grey fw-semi-bold ms-1">
+                                    ({{product.productreview_set.count}} people rated)</span>
+                            </p>
+                            <style>
+                                .fw-semi-bold {
+                                    font-weight: 500 !important;
+                                    color: grey !important;
+                                }
+                            </style>
+                            <div class="media">
+                                <h5 class="mt-1"><b>₦{{ product.price|floatformat:2|intcomma }}</b></h5>
+                                <div class="media-body ">
+                                    <div class="float-right  badge badge-warning alert alert-warning py-2">
+                                        <svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-download"
+                                             fill="currentColor"
+                                             xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd"
+                                                  d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                            <path fill-rule="evenodd"
+                                                  d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                        </svg>
+                                        <strong class="ml-2"> {{ product.product_purchase }} </strong> sales
+                                    </div>
+                                </div>
+                            </div>
+
+                        </a>
+
+
+                    </div>
+                </div>
+                <br>
+                {% endfor %}
+            </div>
+            <br>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col-auto">
+                    {% for i in page_list %}
+                    {% if forloop.first %}
+                    <a class="btn-sm text-decoration-none btn-outline-info btn-info" href="#"
+                       onclick="ajax_paginate_products_function('{{i}}')">{{i}}</a>
+                    {% else %}
+                    <a class="btn-sm text-decoration-none btn-outline-info" href="#"
+                       onclick="ajax_paginate_products_function('{{i}}')">{{i}}</a>
+                    {% endif %}
+                    {% endfor %}
+                    <style>
+                        .btn-outline-info {
+                            color: #bcac76; !important;
+                            border: 1px solid #bcac76; !important;
+                            border-radius: 3px !important;
+                        }
+                        .btn-outline-info:hover {
+                            color: #fff !important;
+                            background: #bcac76; !important;
+                            border-color: #bcac76; !important;
+                        }
+                        .btn-info{
+                            background: #bcac76; !important;
+                            border-color: #bcac76; !important;
+                            border: 1px solid #bcac76; !important;
+                            color: #fff !important;
+                        }
+                        .btn-info:hover{
+                            background: #db3717 !important;
+                            border-color: #db3717 !important;
+                            color: #fff !important;
+                        }
+                        .btn-sm {
+                            padding: .5rem;
+                        }
+                    </style>
+
+                </div>
+            </div>
+            <br>
+            <br>
+            <br>
+            <div class="headline">
+                <div class="get-started p-5">
+                    <div class="container-get-started container">
+                        <h2 class=""><b>Summer <i>Sales</i> Our biggest sales this year — up to 60% <i>off</i>!</b></h2>
+                        <br>
+                        <br>
+                        <a href="" class="btn shadow">Get started</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .thumbnail-product{
+            width: 100%;
+            height: 300px;
+            transition: .3s;
+        }
+    </style>
+    <br>
+    <br>
+    <br>
+
+    {% else %}
+    <div class="container" id="product" align="center">
+        <img class="img-fluid" src="{% static 'images/open-box.png' %}" width="150rem" height="150rem" alt="">
+        <h3><b>We didn't find any product of your choice.</b></h3>
+        <h5>To find what you need, simply check the spelling of your typed search and try again.</h5>
+        <a href="javascript:history.go(-1)" class="btn mt-2 btn-lg">
+            GO BACK?
+        </a>
+        <br>
+        <br>
+    </div>
+    {% endif %}
+</div>
+<style>
+.badge-warning, .alert-warning {
+    background: #bcac76 !important;
+    color: #000 !important;
+}
+    .get-started{
+        background-image: linear-gradient(45deg,  #bcac76, #8e8262, #5e574a, #3a3329);
+        animation: gradient 10s ease infinite;
+        background-size: 400% 400%;
+        color: #fff;
+        height: 17.5rem;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        border-radius: 25px;
+    }
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+    .container-get-started h2{
+        align-items: center;
+        display: inline-block;
+        justify-content: center;
+    }
+
+    .market-started{
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{% static 'images/home-5.jpg' %}') no-repeat;
+        background-attachment: fixed;
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        background-position: relative;
+        background-size: cover;
+        color: #fff;
+        height: 10rem;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        border-radius: 5px;
+    }
+
+    .market-get-started h2{
+        align-items: center;
+        display: inline-block;
+        justify-content: center;
+    }
+    .range_container {
+      display: flex;
+      flex-direction: column;
+      width: 90%;
+      margin: 15% auto;
+    }
+
+    .sliders_control {
+      position: relative;
+      min-height: 50px;
+    }
+
+    .form_control {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      pointer-events: all;
+      width: 24px;
+      height: 24px;
+      background-color: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px #C6C6C6;
+      cursor: pointer;
+    }
+
+    input[type=range]::-moz-range-thumb {
+      -webkit-appearance: none;
+      pointer-events: all;
+      width: 24px;
+      height: 24px;
+      background-color: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px #C6C6C6;
+      cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      background: #f7f7f7;
+    }
+
+    input[type=range]::-webkit-slider-thumb:active {
+      box-shadow: inset 0 0 3px #387bbe, 0 0 9px #387bbe;
+      -webkit-box-shadow: inset 0 0 3px #387bbe, 0 0 9px #387bbe;
+    }
+
+    input[type="number"] {
+      width: 100px;
+      height: 22px;
+      font-size: 17px;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+       opacity: 1;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 2px;
+      width: 100%;
+      position: absolute;
+      background-color: #C6C6C6;
+      pointer-events: none;
+    }
+
+    #fromSlider {
+      height: 0;
+      z-index: 1;
+    }
+
+</style>
+<script>
+    function ajax_paginate_products_function(page) {
+        $.ajax({
+            url: '{% url "paginate_products" %}',
+            type: "get",
+            data: {
+                'page': page,
+            },
+            dataType: 'json',
+            success: function (data) {
+                //$('#products-list').empty();
+                $('#products-list').html('');
+
+                for (i = 0; i < data.length; i++) {
+                    let obj = data[i];
+                    var property_object = `<div class="col-lg-4 px-1 py-1 col-md-6 col-sm-4 mb-2 col-6">
+
+					    <a href="/product/` + obj.id + `">
+                            <img src="` + obj.products_images[0].image + `" fill="777" background="#777" color="#777" alt=""
+                                 class="thumbnail-product">
+                        </a>
+
+                        <div class="card p-2 shadow">
+                            <a href="` + obj.url + `" class="text-dark text-decoration-none">
+                                <h6 class="mb-2 mt-2 text-truncate">` + obj.name + `</h6>
+                                <p class="fs--1">
+                                    {% with int='` + obj.times + `' %}
+                                    {% for i in 2|times %}
+                                    <span class="fa fa-star checked text-warning"></span>
+                                    {% endfor %}
+                                    {% endwith %}
+
+                                    {% for i in 2|times %}
+                                    <span class="fa fa-star"></span>
+                                    {% endfor %}
+
+                                    <span class="text-500 text-grey fw-semi-bold ms-1">
+                                        (` + obj.people_rating + ` people rated)</span>
+                                </p>
+                                <div class="media">
+                                    <h5 class="mt-1"><b>` + obj.edited_price + `</b></h5>
+                                    <div class="media-body ">
+                                        <div class="float-right  badge badge-warning alert alert-warning py-2">
+                                            <svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-download"
+                                                 fill="currentColor"
+                                                 xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd"
+                                                      d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                                <path fill-rule="evenodd"
+                                                      d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                            </svg>
+                                            <strong class="ml-2">` + obj.product_purchase + `</strong> sales
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </a>
+
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <a href="` + obj.vendor_url + `" class="d-flex text-decoration-none">
+                                    <img src="` + obj.vendor.user.image + `" width="30" height="30" class="rounded-circle" alt="">
+                                        <h6 class="mt-1">` + obj.vendor.user.username + `</h6></a>
+
+                                </li>
+                            </ul>
+                        </div>
+					    </div>`;
+					$('#products-list').append(property_object);
+                }
+            }
+        })
+    }
+</script>
+<script>
+    function ajax_high_low_price_products_function(high_low_price) {
+        $.ajax({
+            url: '{% url "high_low_price_products" %}',
+            type: "get",
+            data: {
+                'high_low_price': high_low_price,
+            },
+            dataType: 'json',
+            success: function (data) {
+                //$('#products-list').empty();
+                $('#products-list').html('');
+
+                for (i = 0; i < data.length; i++) {
+                    let obj = data[i];
+                    var property_object = `<div class="col-lg-4 px-1 py-1 col-md-6 col-sm-4 mb-2 col-6">
+
+					    <a href="/product/` + obj.id + `">
+                            <img src="` + obj.products_images[0].image + `" fill="777" background="#777" color="#777" alt=""
+                                 class="thumbnail-product">
+                        </a>
+
+                        <div class="card p-2 shadow">
+                            <a href="` + obj.url + `" class="text-dark text-decoration-none">
+                                <h6 class="mb-2 mt-2 text-truncate">` + obj.name + `</h6>
+                                <p class="fs--1">
+                                    {% with str="` + obj.rating_count + `" %}
+                                    {% for i in 3|times_ajax %}
+                                    <span class="fa fa-star checked text-warning"></span>
+                                    {% endfor %}
+                                    {% endwith %}
+
+                                    {% for i in 2|times %}
+                                    <span class="fa fa-star"></span>
+                                    {% endfor %}
+
+                                    <span class="text-500 text-grey fw-semi-bold ms-1">
+                                        (` + obj.people_rating + ` people rated)</span>
+                                </p>
+                                <div class="media">
+                                    <h5 class="mt-1"><b>` + obj.edited_price + `</b></h5>
+                                    <div class="media-body ">
+                                        <div class="float-right  badge badge-warning alert alert-warning py-2">
+                                            <svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-download"
+                                                 fill="currentColor"
+                                                 xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd"
+                                                      d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                                <path fill-rule="evenodd"
+                                                      d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                            </svg>
+                                            <strong class="ml-2">` + obj.product_purchase + `</strong> sales
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </a>
+
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <a href="` + obj.vendor_url + `" class="d-flex text-decoration-none">
+                                    <img src="` + obj.vendor.user.image + `" width="30" height="30" class="rounded-circle" alt="">
+                                        <h6 class="mt-1">` + obj.vendor.user.username + `</h6></a>
+
+                                </li>
+                            </ul>
+                        </div>
+					    </div>`;
+					$('#products-list').append(property_object);
+                }
+            }
+        })
+    }
+</script>
+<script>
+    function ajax_recent_products_function(recent) {
+        $.ajax({
+            url: '{% url "recent_products" %}',
+            type: "get",
+            data: {
+                'recent': recent,
+            },
+            dataType: 'json',
+            success: function (data) {
+                //$('#products-list').empty();
+                $('#products-list').html('');
+
+                for (i = 0; i < data.length; i++) {
+                    let obj = data[i];
+                    let rat = obj.times;
+                    console.log(rat);
+                    var property_object = `<div class="col-lg-4 px-1 py-1 col-md-6 col-sm-4 mb-2 col-6">
+
+					    <a href="/product/` + obj.id + `">
+                            <img src="` + obj.products_images[0].image + `" fill="777" background="#777" color="#777" alt=""
+                                 class="thumbnail-product">
+                        </a>
+
+                        <div class="card p-2 shadow">
+                            <a href="` + obj.url + `" class="text-dark text-decoration-none">
+                                <h6 class="mb-2 mt-2 text-truncate">` + obj.name + `</h6>
+                                <p class="fs--1">
+                                    {% for i in 3|times %}
+                                    <span class="fa fa-star checked text-warning"></span>
+                                    {% endfor %}
+
+                                    {% for i in 2|times %}
+                                    <span class="fa fa-star"></span>
+                                    {% endfor %}
+
+                                    <span class="text-500 text-grey fw-semi-bold ms-1">
+                                        (` + obj.people_rating + ` people rated)</span>
+                                </p>
+                                <div class="media">
+                                    <h5 class="mt-1"><b>` + obj.edited_price + `</b></h5>
+                                    <div class="media-body ">
+                                        <div class="float-right  badge badge-warning alert alert-warning py-2">
+                                            <svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-download"
+                                                 fill="currentColor"
+                                                 xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd"
+                                                      d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                                <path fill-rule="evenodd"
+                                                      d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                            </svg>
+                                            <strong class="ml-2">` + obj.product_purchase + `</strong> sales
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </a>
+
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <a href="` + obj.vendor_url + `" class="d-flex text-decoration-none">
+                                    <img src="` + obj.vendor.user.image + `" width="30" height="30" class="rounded-circle" alt="">
+                                        <h6 class="mt-1">` + obj.vendor.user.username + `</h6></a>
+
+                                </li>
+                            </ul>
+                        </div>
+					    </div>`;
+					$('#products-list').append(property_object);
+                }
+            }
+        })
+    }
+</script>
+<script>
+
+
+    function controlFromInput(fromSlider, fromInput, toInput, controlSlider) {
+    const [from, to] = getParsed(fromInput, toInput);
+    fillSlider(fromInput, toInput, '#C6C6C6', '#bcac76;', controlSlider);
+    if (from > to) {
+        fromSlider.value = to;
+        fromInput.value = to;
+    } else {
+        fromSlider.value = from;
+    }
+    }
+
+    function controlToInput(toSlider, fromInput, toInput, controlSlider) {
+        const [from, to] = getParsed(fromInput, toInput);
+        fillSlider(fromInput, toInput, '#C6C6C6', '#bcac76;', controlSlider);
+        setToggleAccessible(toInput);
+        if (from <= to) {
+            toSlider.value = to;
+            toInput.value = to;
+        } else {
+            toInput.value = from;
+        }
+    }
+
+    function controlFromSlider(fromSlider, toSlider, fromInput) {
+      const [from, to] = getParsed(fromSlider, toSlider);
+      fillSlider(fromSlider, toSlider, '#C6C6C6', '#bcac76;', toSlider);
+      if (from > to) {
+        fromSlider.value = to;
+        fromInput.value = to;
+      } else {
+        fromInput.value = from;
+      }
+    }
+
+    function controlToSlider(fromSlider, toSlider, toInput) {
+      const [from, to] = getParsed(fromSlider, toSlider);
+      fillSlider(fromSlider, toSlider, '#C6C6C6', '#bcac76;', toSlider);
+      setToggleAccessible(toSlider);
+      if (from <= to) {
+        toSlider.value = to;
+        toInput.value = to;
+      } else {
+        toInput.value = from;
+        toSlider.value = from;
+      }
+    }
+
+    function getParsed(currentFrom, currentTo) {
+      const from = parseInt(currentFrom.value, 10);
+      const to = parseInt(currentTo.value, 10);
+      return [from, to];
+    }
+
+    function fillSlider(from, to, sliderColor, rangeColor, controlSlider) {
+        const rangeDistance = to.max-to.min;
+        const fromPosition = from.value - to.min;
+        const toPosition = to.value - to.min;
+        controlSlider.style.background = `linear-gradient(
+          to right,
+          ${sliderColor} 0%,
+          ${sliderColor} ${(fromPosition)/(rangeDistance)*100}%,
+          ${rangeColor} ${((fromPosition)/(rangeDistance))*100}%,
+          ${rangeColor} ${(toPosition)/(rangeDistance)*100}%,
+          ${sliderColor} ${(toPosition)/(rangeDistance)*100}%,
+          ${sliderColor} 100%)`;
+    }
+
+    function setToggleAccessible(currentTarget) {
+      const toSlider = document.querySelector('#toSlider');
+      if (Number(currentTarget.value) <= 0 ) {
+        toSlider.style.zIndex = 2;
+      } else {
+        toSlider.style.zIndex = 0;
+      }
+    }
+
+    const fromSlider = document.querySelector('#fromSlider');
+    const toSlider = document.querySelector('#toSlider');
+    const fromInput = document.querySelector('#fromInput');
+    const toInput = document.querySelector('#toInput');
+    fillSlider(fromSlider, toSlider, '#C6C6C6', '#bcac76;', toSlider);
+    setToggleAccessible(toSlider);
+
+    fromSlider.oninput = () => controlFromSlider(fromSlider, toSlider, fromInput);
+    toSlider.oninput = () => controlToSlider(fromSlider, toSlider, toInput);
+    fromInput.oninput = () => controlFromInput(fromSlider, fromInput, toInput, toSlider);
+    toInput.oninput = () => controlToInput(toSlider, fromInput, toInput, toSlider);
+</script>
+
+{% endblock %}
