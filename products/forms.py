@@ -1,4 +1,6 @@
 from django import forms
+from django.forms.utils import ErrorList
+
 from .models import *
 
 
@@ -25,3 +27,22 @@ class ReviewBox(forms.ModelForm):
     class Meta:
         model = ProductReview
         fields = ["rating", "review"]
+
+
+class AddressForm(forms.ModelForm):
+    address = forms.CharField(max_length=500, required=True, widget=forms.TextInput(attrs={
+        "name": "address",
+        "placeholder": "Enter house / apartment number and street address",
+        'type': 'text',
+        "required": True,
+        "id": "my-address"
+    }))
+
+    class Meta:
+        model = Order
+        fields = ["address"]
+
+
+class ApplyCouponForm(forms.Form):
+    code = forms.CharField(max_length=50, required=False, label=False)
+

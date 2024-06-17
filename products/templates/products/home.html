@@ -2,6 +2,8 @@
 {% load static %}
 {% load humanize %}
 {% load crispy_forms_tags %}
+{% load pwa %}
+{% progressive_web_app_meta %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -93,7 +95,8 @@
                                class="ml-0 btn">
                     </form>
                 </div>
-                <b class="mt-2 text-dark" style="margin-right: 20px"><span style="font-size: 1.4em">Popular:</span>
+                <b class="mt-2 text-dark" style="margin-right: 20px">
+                    <span style="font-size: 1.4em; top 1em;">Popular:</span>
                     <div class="badge py-2 badge-danger">Shirt</div>
                     <div class="badge ml-2 py-2 badge-secondary">Pants</div>
                     <div class="badge ml-2 py-2 badge-success"> Blazer</div>
@@ -129,7 +132,7 @@
             <style>
                 .category-link {color: #000;}
                 .category-link:hover{
-                    color: #db3717;
+                    color: #8e8262;
                     }
             </style>
         </div>
@@ -294,7 +297,8 @@
                         updateCountdown(); // Initial update
                     </script>
 
-                    <p><a class="btn btn-outline-dark" style="letter-spacing: 0.2em; border-color: #8e8262;
+                    <p><a class="btn btn-outline-dark"
+                          style="letter-spacing: 0.2em; border-color: #8e8262;
                         text-transform: uppercase;
                         color: #8e8262;
                         font-weight: bold;" href="#">Shop now</a></p>
@@ -319,7 +323,7 @@
         slightly domed and divided by arches into stiff sections</b>
     <br>
     <br>
-    <div class="row headline p-2">
+    <div class="row headline mt-0" style="padding: 5rem !important">
         {% if products %}
         {% for product in products %}
         <div class="col-lg-3 col-md-4 col-sm-4 col-6">
@@ -437,8 +441,8 @@
                                 </div>
                                 <div class="testimonial-content">
                                     <p class="text">
-                                        Stop wasting time and money designing and managing a
-                                        website that doesn’t get results. Happiness lorem guaranteed!
+                                        These headphones are fantastic! The noise cancellation is top-notch, completely blocking out distractions while I'm working from home. The sound quality is crisp and clear, with deep bass that makes listening to music a real pleasure. The battery life is impressive too, lasting me several days on a single charge. They're surprisingly comfortable to wear for extended periods, even with glasses. Overall, a great value for the price!
+
                                     </p>
                                     <h6 class="author-name">Isabela Moreira</h6>
                                     <span class="sub-title">CEO, GrayGrids</span>
@@ -464,8 +468,8 @@
                                 </div>
                                 <div class="testimonial-content">
                                     <p class="text">
-                                        Stop wasting time and money designing and managing a
-                                        website that doesn’t get results. Happiness lorem guaranteed!
+                                        The sound quality on these headphones is excellent. Music sounds rich and detailed, and movies are truly immersive. I also appreciate the sleek design and comfortable fit. However, the microphone quality is a bit disappointing. My voice sounds muffled during calls, and callers have difficulty hearing me clearly. This might be a dealbreaker for those who need headphones for frequent calls.
+
                                     </p>
                                     <h6 class="author-name">Fajar Siddiq</h6>
                                     <span class="sub-title">Founder, MakerFlix</span>
@@ -490,8 +494,8 @@
                                 </div>
                                 <div class="testimonial-content">
                                     <p class="text">
-                                        Stop wasting time and money designing and managing a
-                                        website that doesn’t get results. Happiness lorem guaranteed!
+                                        These headphones boast amazing battery life, easily lasting me a week between charges. They're perfect for long trips or extended listening sessions. Unfortunately, the sound profile is a bit flat out of the box. There's no built-in equalizer or app to adjust the audio settings, which some users might find limiting. Additionally, the controls can be a tad finicky at times.
+
                                     </p>
                                     <h6 class="author-name">Fiona</h6>
                                     <span class="sub-title">Lead Designer, UIdeck</span>
@@ -516,8 +520,8 @@
                                 </div>
                                 <div class="testimonial-content">
                                     <p class="text">
-                                        Stop wasting time and money designing and managing a
-                                        website that doesn’t get results. Happiness lorem guaranteed!
+                                        I loved the sleek and stylish design of these headphones. They felt lightweight and comfortable to wear, and the touch controls were convenient. However, the build quality seems lacking. The ear cups developed a slight crack after just a few months of use, and the overall construction feels a bit flimsy. For the price point, I expected a more durable product.
+
                                     </p>
                                     <h6 class="author-name">Elon Rashford</h6>
                                     <span class="sub-title">CEO, SpaceX</span>
@@ -865,7 +869,7 @@
     <div class="container justify-content-between py-2 ">
         <div class="row pt-5 mt-8">
             <div class="col-md-4 col-sm-6">
-                <h3 class="font-weight-light">CSC 420 - SOFTWARE ENGINEERING</h3>
+                <h3 class="font-weight-light mb-2">CSC 420 - SOFTWARE ENGINEERING</h3>
                 <p>
                     High quality items created by our global community.
                 </p>
@@ -874,23 +878,22 @@
                 <b style="color:#BCAC76" class="ml-2">{{ users_count }} </b> Users
             </div>
             <div class="col-md-3 col-sm-6">
-                <h3 class="font-weight-light">Market Categories</h3>
+                <h3 class="font-weight-light mb-2">Market Categories</h3>
                 {% for category in categories %}
                 <p>{{ category }}</p>
                 {% endfor %}
             </div>
             <br>
             <div class="col-md-2">
-                <h3 class="font-weight-light">Features</h3>
+                <h3 class="font-weight-light mb-2">Features</h3>
                 <p>Online purchase</p>
                 <p>Swift delivery service</p>
-                <p>Secure payment with Stripe</p>
-                <p>Message through the message box</p>
+                <p>Secure payment with Paystack</p>
             </div>
             <br>
             <div class="col-md-3">
                 <div class="widget pb-2">
-                    <h3 class="font-weight-light pb-1">Stay informed</h3>
+                    <h3 class="font-weight-light mb-2 pb-1">Stay informed</h3>
                     <form class="needs-validation"
                           action="{% url 'home' %}"
                           method="POST" novalidate>
@@ -922,8 +925,7 @@
             <span class="text-decoration-none">
             © 2024-CSC 420 - SOFTWARE ENGINEERING.
             </span>
-            <a class="text-decoration-none font-weight-normal" href="/"
-               target="_blank" rel="noopener">Favour Elodimuor</a><br><br>
+
             <a href="https://www.facebook.com/favour.elodimuor/">
                 <img src="https://img.icons8.com/fluent/48/000000/facebook-new.png"/></a>
             <a href="https://www.twitter.com/felodimuor/">
@@ -934,14 +936,50 @@
         </p>
     </div>
 </footer>
-<a class="scroll-to-top rounded" href="#page-top">
+<a class="scroll-to-top shadow-lg rounded-circle" href="#page-top">
     <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-arrow-up" fill="currentColor"
          xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd"
               d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
     </svg>
 </a>
-</body>
+<style>
+.scroll-to-top{
+    position:fixed;
+    border-radius: 50%;
+    box-shadow:hsl(0, 0%, 80%) 0 0 16px;
+    right:1rem;
+    bottom:1rem;
+    display:none;
+    width:3rem;
+    height:3rem;
+    color:#fff;
+    background:#bcac76;
+    padding: 8px;
+}
+.scroll-to-top:focus,.scroll-to-top:hover{
+    color:#fff
+}
+.scroll-to-top:hover{
+    background:#8e8262;
+}
+.scroll-to-top i{
+    font-weight:800
+}
+@-webkit-keyframes growIn{
+    0%{transform:scale(.9);
+    opacity:0
+}
+100%{
+    transform:scale(1);opacity:1}
+}
+@keyframes growIn{
+    0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+    In{0%{opacitation-name:fadeIn;animation-name:fadeIn;-webkit-animation-duration:.2s;animation-duration:.2s;
+    -webkit-animation-timing-function:opacity cubic-bezier(0,1,.4,1);
+    animation-timing-function:opacity cubic-bezier(0,1,.4,1)
+    }
+</style>
 <style>
 
     .box-element {
@@ -951,61 +989,6 @@
         padding: 10px;
         padding-bottom: 10px;
     }
-    .color-3 {
-        box-shadow:hsl(0, 0%, 80%) 0 0 16px;
-        background-color: pink;
-        border-radius: 7px;
-        width: 100px;
-        padding: 10px;
-        color:#fff;
-    }
-    .color-2 {
-        box-shadow:hsl(0, 0%, 80%) 0 0 16px;
-        background-color: #BCAC76;
-        border-radius: 7px;
-        width: 100px;
-        padding: 10px;
-        color: var(--white);
-    }
-    .color-1 {
-        box-shadow:hsl(0, 0%, 80%) 0 0 16px;
-        background-color: var(--warning);
-        border-radius: 7px;
-        width: 100px;
-        padding: 10px;
-        color: var(--white);
-    }
-
-    .scroll-to-top{
-        position:fixed;
-        right:1rem;
-        bottom:1rem;
-        display:none;
-        width:2.75rem;
-        height:2.75rem;
-        text-align:center;
-        color:#fff;
-        background:rgba(90,92,105,.5);
-        line-height:46px
-    }
-    .scroll-to-top:focus,.scroll-to-top:hover{
-        color:#fff
-    }
-    .scroll-to-top:hover{
-        background:#5a5c69
-    }
-    .scroll-to-top i{
-        font-weight:800
-    }
-    @-webkit-keyframes growIn{
-        0%{transform:scale(.9);
-        opacity:0
-    }
-    100%{
-        transform:scale(1);opacity:1}
-    }
-    @keyframes growIn{
-        0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}In{0%{opacitation-name:fadeIn;animation-name:fadeIn;-webkit-animation-duration:.2s;animation-duration:.2s;-webkit-animation-timing-function:opacity cubic-bezier(0,1,.4,1);animation-timing-function:opacity cubic-bezier(0,1,.4,1)}
 
     .bg-light {
         background-color: #f6f9fc !important;

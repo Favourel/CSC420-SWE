@@ -256,30 +256,7 @@
                     }
 
                 </style>
-                <!--                .article-content {-->
-                <!--                        white-space: pre-line;-->
-                <!--                        word-wrap: break-word;-->
-                <!--                    }-->
-            </div>
-            <div class="modal fade" id="exampleDelete" tabindex="-1" aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content" style="background-color: #f6f9fc !important">
-                        <div class="modal-body">
-                            <form action="{{ product.get_absolute_url }}" method="post">
-                                {% csrf_token %}
-                                <h6>Are you sure you want to delete <b style="color: #007bff">{{ product }}</b> from
-                                    your
-                                    store?</h6>
-                                <div class="float-right">
-                                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close
-                                    </button>
-                                    <input type="submit" value="CONFIRM" class="btn ">
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+
             </div>
             <br>
 
@@ -732,8 +709,10 @@
                 </script>
             </section>
             <br>
+            {% if recently_viewed_products|length > 0 %}
+            <br>
             <h4><b>Recently Viewed Products</b></h4>
-            <div class="row">
+            <div class="row p-3">
                 {% for product in recently_viewed_products %}
                 <div class="col-lg-4 col-md-6  mb-2 col-6">
                     <style>
@@ -807,6 +786,7 @@
                 <br>
                 {% endfor %}
             </div>
+            {% endif %}
         </div>
         <div class="col-lg-3">
             <div class="box-element" id="form-wrapper">

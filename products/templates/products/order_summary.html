@@ -1,0 +1,239 @@
+{% extends 'products/base.html' %}
+
+{% load static %}
+{% load humanize %}
+{% block title %}Order Summary{% endblock %}
+{% load filtertags %}
+{% block content %}
+<style>
+    .section {
+       background: #bcac76;
+       border-color: #bcac76;
+       color: #fff;
+       position: relative;
+    }
+    .search-category {
+         position: absolute;
+         top: 190px;
+         width: 73%;
+         margin-bottom: 35rem !important;
+    }
+</style>
+<div class="section">
+    <div class="container py-5" style="height: 18vh;">
+        <h1><b>Order Summary</b></h1>
+    </div>
+</div>
+<!--<br><br><br>-->
+<div class="container mb-5">
+    <div class="search-category">
+        <div class="row">
+            <div class="col-lg-6">
+                <br>
+                <br>
+                <div class="media mt-5">
+                    <div class="d-flex align-items-center justify-content-center bg-success text-white rounded-circle flex-shrink-0"
+                         style="width: 4rem; height: 4rem; margin-top: -.125rem">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor"
+                             class="bi bi-check-lg" viewBox="0 0 16 16">
+                            <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                        </svg>
+                    </div>
+                    <div class="media-body ml-2">
+                        <p class="mb-1" style="font-size: 15px">Order : #{{order.transaction_id}}</p>
+                        <h4><b>Thank you for your order!</b></h4>
+                    </div>
+                </div>
+                <hr>
+                <br>
+                <h5 style="line-height: 1.35;"><b>Delivery</b></h5>
+                <p style="font-size: .875rem !important;">{{order.address}}</p>
+
+                <h5 class="mt-3" style="line-height: 1.35;"><b>Items</b></h5>
+                {% for item in order.order_item.all %}
+                <p style="font-size: .875rem !important;" class="mb-1">
+                    {{ item }}
+                </p>
+                {% endfor %}
+                <h5 class="mt-3" style="line-height: 1.35;"><b>Reference ID</b></h5>
+                <p style="font-size: .875rem !important;">{{order.reference}}</p>
+                <hr class="py-3">
+                {% if not used_coupon %}
+                <div class="bg-brown px-3 py-3">
+                    <div class="py-3">
+                        <h2 class="h4 text-center pb-2 mb-1">
+                            🎉 Congratulations! 30% off your new purchase!</h2>
+                        <p class="fs-sm text-center mb-4">
+                            Use the coupon now or look for it in your personal account.</p>
+                        <div class="d-flex gap-2 mx-auto" style="max-width: 400px">
+                            <input type="text" class="form-control border-white border-opacity-10 w-100" id="couponCode"
+                                   value="{{coupon_value.coupon}}" readonly="">
+                            <button type="button" id="copy-button" class="btn btn-outline-info"
+                                    data-copy-text-from="#couponCode"
+                                    data-toggle="tooltip" data-placement="top" title="COPY">COPY
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            <br>
+            <br>
+            <br>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="box-element" style="background-color:#fff !important" align="center">
+                    <br>
+                    <br>
+                    <h5><b>You may also like</b></h5>
+                    <div class="row p-4">
+                        {% for product in similar_items %}
+                        <div class="col-lg-6 col-md-6 mb-2 col-6">
+                            <style>
+                                .col-6 {
+                                    padding: 6px;
+                                }
+                            </style>
+                            <a href="{{ product.get_absolute_url }}">
+                                {% if product.productimage_set.all %}
+
+                                {% for product_image in product.productimage_set.all %}
+                                {% if forloop.first %}
+
+                                <div class="single-testimonial text-center">
+                                    <img loading="lazy" src="{{ product_image.image.url }}" fill="777" background="#777"
+                                         color="#777" alt=""
+                                         class="thumbnail-product">
+                                </div>
+                                {% endif %}
+
+                                {% endfor %}
+
+                                {% else %}
+                                <img src="{{ product.image.url }}" alt=""
+                                     class="thumbnail-product">
+                                {% endif %}
+
+                            </a>
+
+                            <div class="card p-2">
+                                <a href="{{ product.get_absolute_url }}" class="text-dark text-decoration-none">
+                                    <h6 class="mb-2 mt-2 text-truncate">{{ product.name }}</h6>
+                                    <p class="fs--1">
+                                        {% for i in product.rating_count|times %}
+                                        <span class="fa fa-star checked text-warning"></span>
+                                        {% endfor %}
+                                        {% for i in product.rating_count|times_minus %}
+                                        <span class="fa fa-star"></span>
+                                        {% endfor %}
+                                        <span class="text-500 text-grey fw-semi-bold ms-1">
+                                    ({{product.productreview_set.count}} people rated)</span>
+                                    </p>
+                                    <style>
+                                        .fw-semi-bold {
+                                            font-weight: 500 !important;
+                                            color: grey !important;
+                                        }
+                                    </style>
+                                    <div class="media">
+                                        <h5 class="mt-1"><b>₦{{ product.price|floatformat:2|intcomma }}</b></h5>
+                                        <div class="media-body ">
+                                            <div class="float-right  badge badge-warning alert alert-warning py-2">
+                                                <svg width="1.2em" height="1.2em" viewBox="0 0 16 16"
+                                                     class="bi bi-download"
+                                                     fill="currentColor"
+                                                     xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd"
+                                                          d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                                    <path fill-rule="evenodd"
+                                                          d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                                </svg>
+                                                <strong class="ml-2"> {{ product.product_purchase }} </strong> sales
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </a>
+
+
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <br>
+                    <a href="{% url 'products' %}" style="letter-spacing: 0.2em; font-weight: bold;
+                    text-transform: uppercase" class="btn">
+                        Continue Shopping
+                        <span class="svg-icon svg-icon-sm svg-icon-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                             fill="none">
+                            <path d="M12.6343 12.5657L8.45001 16.75C8.0358 17.1642 8.0358 17.8358 8.45001 18.25C8.86423 18.6642 9.5358 18.6642 9.95001 18.25L15.4929 12.7071C15.8834 12.3166 15.8834 11.6834 15.4929 11.2929L9.95001 5.75C9.5358 5.33579 8.86423 5.33579 8.45001 5.75C8.0358 6.16421 8.0358 6.83579 8.45001 7.25L12.6343 11.4343C12.9467 11.7467 12.9467 12.2533 12.6343 12.5657Z"
+                                  fill="black"></path>
+                        </svg>
+                    </span>
+                    </a>
+                    <br>
+                    <br>
+                </div>
+            <br>
+            <br>
+            <br>
+            </div>
+
+        </div>
+    </div>
+</div>
+<br>
+<br>
+<br>
+<br>
+
+<style>
+    .thumbnail-product{
+        width: 100%;
+        height: 300px;
+        transition: .3s;
+    }
+    .bg-brown {
+        background: #bcac76;
+        border-color: #bcac76;
+        color: #000 !important;
+    }
+    .btn-outline-info {
+        color: #000 !important;
+        border: 1px solid #bcac76 !important;
+        border-radius: 10px !important;
+        background: #fff !important;
+    }
+
+</style>
+<script>
+    const readOnlyInput = document.getElementById('couponCode');
+    const copyButton = document.getElementById('copy-button');
+
+    copyButton.addEventListener('click', function() {
+      const textToCopy = readOnlyInput.value;
+
+      // Using Clipboard API (modern browsers)
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          console.log('Text copied to clipboard!');
+        }, () => {
+          console.error('Failed to copy text!');
+        });
+      } else {
+        // Fallback for older browsers (using a hidden text area)
+        const textArea = document.createElement('textarea');
+        textArea.value = textToCopy;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+        console.log('Text copied to clipboard (fallback method)');
+      }
+    });
+        $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+{% endblock %}

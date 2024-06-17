@@ -11,9 +11,8 @@ urlpatterns = [
     path("<uuid:pk>/delete_from_checkout/", product_view.delete_from_checkout, name="delete_from_checkout"),
     path("checkout/", product_view.checkout, name="checkout"),
     path("process/order/", product_view.process_order, name="process_order"),
-    path("paginate_products/", product_view.paginate_products, name="paginate_products"),
-    path("high_low_price_products/", product_view.high_low_price_products, name="high_low_price_products"),
-    path("recent_products/", product_view.recent_products, name="recent_products"),
+    path("apply_coupon/", product_view.apply_coupon, name="apply_coupon"),
+
     path("product/<uuid:pk>/review", product_view.product_review, name="productReview"),
 
 ]

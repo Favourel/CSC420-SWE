@@ -16,7 +16,6 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -27,7 +26,6 @@ SECRET_KEY = 'django-insecure-_y0s!poeb$e8x=6@n)3pcbs_0n-iobc=*3qqip!eok_@p=2nh_
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -41,8 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    "crispy_forms"
+    "crispy_forms",
+    "pwa",
 
+]
+
+AUTHENTICATION_BACKENDS = [
+    'users.university_authentication.backends.UniversityAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 MIDDLEWARE = [
@@ -76,7 +80,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'CSC420.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -86,7 +89,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -106,7 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -117,7 +118,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -139,7 +139,6 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "products"
@@ -147,3 +146,49 @@ LOGOUT_REDIRECT_URL = "login"
 
 PAYSTACK_SECRET_KEY = os.environ.get("PAYSTACK_SECRET_KEY")
 PAYSTACK_PUBLIC_KEY = os.environ.get("PAYSTACK_PUBLIC_KEY")
+
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
+
+PWA_APP_NAME = 'CSC420'
+PWA_APP_DESCRIPTION = "CSC 420 - SOFTWARE ENGINEERING"
+PWA_APP_THEME_COLOR = '#bcac76'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = "/"
+PWA_APP_ORIENTATION = 'any'
+PWA_APP_START_URL = "/"
+PWA_APP_STATUS_BAR_COLOR = 'default'
+PWA_APP_ICONS = [
+    {
+        'src': 'static/images/Square150x150Logo.scale-200.png',
+        'sizes': '300x300'
+    }
+]
+PWA_APP_ICONS_APPLE = [
+    {
+        'src': 'static/images/Square150x150Logo.scale-200.png',
+        'sizes': '300x300'
+    }
+]
+PWA_APP_SPLASH_SCREEN = [
+    {
+        'src': 'static/images/Square150x150Logo.scale-200.png',
+        'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)'
+    }
+]
+PWA_APP_DIR = 'ltr'
+PWA_APP_LANG = 'en-US'
+
+PWA_APP_SCREENSHOTS = [
+    {
+        'src': 'static/images/127.0.0.1_8000_products_.png',
+        'sizes': '1537x1886',
+        'type': 'image/png',
+        'form_factor': 'wide'
+    },
+    {
+        'src': 'static/images/127.0.0.1_8000_products_.png',
+        'sizes': '640x480',
+        'type': 'image/png'
+    }
+]

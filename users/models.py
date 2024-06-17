@@ -12,6 +12,7 @@ from products.models import Checkout
 
 class User(AbstractUser):
     phone_number = models.CharField(max_length=15, null=True, blank=True)
+    picture_url = models.ImageField(default='2placeholder_test_b9l9NT5.png', upload_to='profile_images')
 
 
 class Notification(models.Model):

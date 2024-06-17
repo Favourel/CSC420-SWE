@@ -1,20 +1,39 @@
 {% extends 'products/base.html' %}
 {% load static %}
 {% load humanize %}
-{% block title %}{{ vendor }} checkout{% endblock %}
+{% load crispy_forms_tags %}
+{% block title %} Checkout{% endblock %}
 {% block content %}
 
 <script src="https://js.paystack.co/v1/inline.js"></script>
 
-<div class="container">
-    <br>
-    <h2><b>Cart & Checkout</b></h2>
-    <a class="btn mb-3" href="{% url 'products' %}">&#x2190; Continue searching</a>
+<style>
+    .section {
+       background: #bcac76;
+       border-color: #bcac76;
+       color: #fff;
+       position: relative;
+    }
+    .search-category {
+         position: absolute;
+         top: 190px;
+         width: 73%;
+         margin-bottom: 35rem !important;
+    }
+</style>
+<div class="section">
+    <div class="container py-5" style="height: 18vh;">
+        <h1><b>Cart & Checkout</b></h1>
+    </div>
+</div>
+<!--<br><br><br>-->
+<div class="container mb-5">
+    <div class="search-category">
     <div class="row screen">
         <br>
-        <div class="col-lg-9">
+        <div class="col-lg-9 mt-5">
             <br>
-
+            {% if items %}
             <section>
                 <div class="cart-row d-md-flex d-none">
                     <div style="flex:4;opacity: .7" class="mr-2">
@@ -31,7 +50,7 @@
                 </div>
 
                 {% for item in items %}
-                <div class="box-element">
+                <div class="box-element" style="background-color:#fff !important">
                     <div class="cart">
                         <div class="cart-body">
                             <div class="cart-item">
@@ -44,23 +63,27 @@
                                             <a href="{% url 'product-detail' item.product.id %}">
                                                 {% if item.product.productimage_set.all %}
 
-                                                    {% for product_image in item.product.productimage_set.all %}
-                                                        {% if forloop.first %}
-                                                        <img height="70px" width="70px" src="{{ product_image.image.url }}" alt=""
-                                                            class="row-ima">
-                                                        {% endif %}
+                                                {% for product_image in item.product.productimage_set.all %}
+                                                {% if forloop.first %}
+                                                <img height="70px" width="70px" src="{{ product_image.image.url }}"
+                                                     alt=""
+                                                     class="row-ima">
+                                                {% endif %}
 
-                                                    {% endfor %}
+                                                {% endfor %}
 
                                                 {% else %}
 
-                                                <img height="70px" width="70px" src="{{ item.product.image.url }}" alt=""
+                                                <img height="70px" width="70px" src="{{ item.product.image.url }}"
+                                                     alt=""
                                                      class="row-ima">{% endif %}
                                             </a>
-                                            <div class="cart-title text-left" style="overflow-wrap: break-word !important;">
+                                            <div class="cart-title text-left"
+                                                 style="overflow-wrap: break-word !important;">
                                                 <a class="text-dark link-animated" style="overflow-wrap: break-word;"
                                                    href="{% url 'product-detail' item.product.id %}">
-                                                    <strong style="overflow-wrap: break-word;">{{ item.product.name }}
+                                                    <strong style="overflow-wrap: break-word;">
+                                                        {{ item.product.name }}
                                                     </strong>
                                                 </a>
                                                 <br>
@@ -125,7 +148,7 @@
                                                         <div class="d-flex align-items-center">
                                                             {% if item.quantity > 1 %}
                                                             <a href="{% url 'remove_from_checkout' item.product.pk %}"
-                                                                    class="text-decoration-none btn-sm btn-secondary update-cart">
+                                                               class="text-decoration-none btn-sm btn-secondary update-cart">
                                                                 <b>-</b>
                                                             </a>
                                                             {% else %}
@@ -139,7 +162,7 @@
                                                                 {{ item.quantity }}
                                                             </b>
                                                             <a href="{% url 'add_to_checkout' item.product.pk %}"
-                                                                    class="update-cart text-decoration-none btn-sm btn-secondary">
+                                                               class="update-cart text-decoration-none btn-sm btn-secondary">
                                                                 <b>+</b>
                                                             </a>
                                                         </div>
@@ -152,14 +175,15 @@
                                                     <b class="text-right text-md-center col-6 col-md-12">
                                                         ₦{{ item.get_total|floatformat:'2'|intcomma }}
                                                         <br>
-                                                        <small>₦{{ item.product.price|floatformat:'2'|intcomma }} x {{ item.quantity }}</small>
+                                                        <small>₦{{ item.product.price|floatformat:'2'|intcomma }} x
+                                                            {{ item.quantity }}</small>
                                                     </b>
                                                 </div>
                                             </div>
                                             <div class="d-md-block d-none text-center col-2"
                                                  data-toggle="tooltip" title="Remove from Cart" data-placement="top">
                                                 <a class="cart-remove text-muted update-cart"
-                                                   href="{% url 'delete_from_checkout' item.product.pk  %}" >
+                                                   href="{% url 'delete_from_checkout' item.product.pk  %}">
                                                     <svg width="2em" height="2em" viewBox="0 0 16 16"
                                                          class="bi bi-trash"
                                                          fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -181,67 +205,123 @@
                 </div>
                 <br>
                 {% endfor %}
+
             </section>
+            <br>
+            <br>
+            <section>
+                <h5><b>Delivery address</b></h5>
+                <br>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {{ form | crispy }}
+                </form>
+            </section>
+            {% else %}
+            <h2><b>Nothing to see here!</b></h2>
+            <br>
+            <a style="letter-spacing: 0.2em; font-weight: bold;
+                    text-transform: uppercase" class="btn" href="{% url 'products' %}">
+                Start shopping</a>
+            {% endif %}
         </div>
-        <div class="col-lg-3 mt-3">
-<!--            <div class="sticky-top" style="top: 9px">-->
-                <div class="box-element">
-                    <h5><b>Order Summary</b></h5>
-                    <style>
-                        .card-header:first-child {
-                                border-radius: 5px 5px 0 0;
-                            }
-                        .card-header {
-                            padding: .75rem 1.25rem;
-                            margin-bottom: 0;
-                            background-color: rgba(0,0,0,.03);
-                            border-bottom: 0 solid transparent;
+        <div class="col-lg-3 ">
+            <!--            <div class="sticky-top" style="top: 9px">-->
+            <div class="box-element" style="background-color:#fff !important">
+                <h5><b>Order Summary</b></h5>
+                <style>
+                    .card-header:first-child {
+                            border-radius: 5px 5px 0 0;
                         }
-                    </style>
-                    <table class="table table-hover">
-                        <tr>
-                            <th><h5>Items: </h5></th>
-                            <th><h5>{{ get_cart_items }}</h5></th>
-                        </tr>
-                        <tr>
-                            <th><h5>Shipping Fee: </h5></th>
-                            <th><h5>₦{{ get_shipping_fee }}</h5></th>
-                        </tr>
-                        <tr>
-                            <th><h5 class="mt-2">Subtotal: </h5></th>
-                            <th><h5 class="mt-2">₦{{ get_cart_total|floatformat:2|intcomma }}</h5></th>
-                        </tr>
-                        <tr>
-                            <th><h5 class="mt-2">Summary: </h5></th>
-                            <th><h5 id="amount" class="mt-2">₦{{ get_cart_total|add:get_shipping_fee|floatformat:2|intcomma }}</h5></th>
-                        </tr>
-                    </table>
-                    <hr>
-                    <li class="text-muted">Shipping and additional costs are calculated based on values you have entered.
-                    </li>
-                    <li class="text-muted">Delivery takes {{ item.vendor.vendor_delivery_method }} days</li>
-                    <br>
-                    {% if items|length > 0 %}
-                    <a href="{% url 'process_order' %}" type="submit" onclick="payWithPaystack()" id="make-payment" class="btn btn-block">
-                        <div class="spinner-border text-light hide" id="spinner" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                        <span style="letter-spacing: 0.2em;
+                    .card-header {
+                        padding: .75rem 1.25rem;
+                        margin-bottom: 0;
+                        background-color: rgba(0,0,0,.03);
+                        border-bottom: 0 solid transparent;
+                    }
+                </style>
+                <table class="table table-hover">
+                    <tr>
+                        <th><h5>Items: </h5></th>
+                        <th><h5>{{ get_cart_items }}</h5></th>
+                    </tr>
+                    <tr>
+                        <th><h5>Delivery Fee: </h5></th>
+                        <th><h5>₦{{ get_shipping_fee }}</h5></th>
+                    </tr>
+                    <tr>
+                        <th><h5 class="mt-2">Subtotal: </h5></th>
+                        <th><h5 class="mt-2">₦{{ get_cart_total|floatformat:2|intcomma }}</h5></th>
+                    </tr>
+                    <tr>
+                        <th><h5 class="mt-2">Summary: </h5></th>
+                        <th><h5 id="amount" class="mt-2">
+                            ₦{{ get_cart_total|add:get_shipping_fee|floatformat:2|intcomma }}</h5></th>
+                    </tr>
+                </table>
+                <hr>
+                <li class="text-muted">Shipping and additional costs are calculated based on values you have entered.
+                </li>
+                <li class="text-muted">
+                    Free delivery for goods over ₦30,000.
+                </li>
+                <li class="text-muted">Delivery takes 2-3 days</li>
+                <br>
+                {% if items|length > 0 %}
+                <a type="submit" onclick="payWithPaystack()" id="make-payment"
+                   class="btn btn-block">
+                    <div class="spinner-border text-light hide" id="spinner" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <span style="letter-spacing: 0.2em;
                             text-transform: uppercase;
                             color: #fff;
                             font-weight: bold;" id="button-text">CHECKOUT</span>
-                    </a>
-                    <style>
-                        .spinner-border {
-                            width: 1.5rem;
-                            height: 1.5rem;
-                        }
-                    </style>
-                    {% endif %}
+                </a>
+                <style>
+                    .spinner-border {
+                        width: 1.5rem;
+                        height: 1.5rem;
+                    }
+                </style>
+                {% endif %}
+            </div>
+
+            <br>
+            <div class="box-element">
+                <h6>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                         class="bi bi-percent"
+                         viewBox="0 0 16 16">
+                        <path d="M13.442 2.558a.625.625 0 0 1 0 .884l-10 10a.625.625 0 1 1-.884-.884l10-10a.625.625 0 0 1 .884 0M4.5 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5m7 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+                    </svg>
+                    <b data-toggle="collapse" href="#collapseExample" role="button"
+                       aria-expanded="false" aria-controls="collapseExample">
+                        Apply promo code
+                    </b>
+                </h6>
+                <div class="collapse" id="collapseExample">
+                    <div class="card card-body">
+                        <div class="row">
+                            <form action="{% url 'apply_coupon' %}" method="post">
+                                {% csrf_token %}
+                                <div class="col">
+                                    {{form_coupon|crispy}}
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-block btn-info">Apply</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-<!--            </div>-->
+            </div>
+            <br>
+            <br>
+            <br>
         </div>
     </div>
+</div>
 </div>
 <br>
 <br>
@@ -251,99 +331,80 @@
     }
 </style>
 <script type="text/javascript">
-var user = '{{ request.user }}'
+    var user = '{{ request.user }}'
 
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
         }
+        return cookieValue;
     }
-    return cookieValue;
-}
-const csrftoken = getCookie('csrftoken');
+    const csrftoken = getCookie('csrftoken');
 </script>
 <script>
-const paymentForm = document.getElementById('make-payment');
-paymentForm.addEventListener("click", payWithPaystack, false);
-function payWithPaystack(e) {
-  e.preventDefault();
+    const inputElement = document.getElementById('my-address');
+    const paymentForm = document.getElementById('make-payment');
+    paymentForm.addEventListener("click", payWithPaystack, false);
+    function payWithPaystack(e) {
+      e.preventDefault();
 
-  let handler = PaystackPop.setup({
-    key: '{{paystack_public_key}}', // Replace with your public key
-    email: '{{ request.user.email }}',
-    currency: 'NGN',
-    amount: '{{ get_cart_total|add:get_shipping_fee }}' * 100,
-    ref: '{{ payment.ref }}', // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
-    //ref: ''+Math.floor((Math.random() * 1000000000) + 1), // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
-    // label: "Optional string that replaces customer email"
-    onClose: function(){
-      alert('There was an error with processing payment. Kindly refresh page and run again');
-    },
-    callback: function(response){
-      let message = 'Payment complete! Reference: ' + response.reference;
-      //window.location.href = "{% url 'process_order' %}"
+      let handler = PaystackPop.setup({
+        key: '{{paystack_public_key}}', // Replace with your public key
+        email: '{{ request.user.email }}',
+        currency: 'NGN',
+        amount: '{{ get_cart_total|add:get_shipping_fee }}' * 100,
+        ref: '{{ payment.ref }}', // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
+        //ref: ''+Math.floor((Math.random() * 1000000000) + 1), // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
+        // label: "Optional string that replaces customer email"
+        onClose: function(){
+          alert('There was an error with processing payment. Kindly refresh page and run again');
+        },
+        callback: function(response){
+          let message = 'Payment complete! Reference: ' + response.reference;
 
-      var userData = {
-                'reference':response.reference
-            }
-        var url = '{% url 'process_order' %}'
-        //console.log(userData);
+          var userData = {
+                    'reference':response.reference
+                }
+            var url = '{% url 'process_order' %}'
 
-        fetch(url,
-            {
-                method: 'POST',
-                headers: {'Content-Type': '/application/json', 'X-CSRFToken':csrftoken,},
-                body:JSON.stringify({'ref': userData})
-            }
-        )
+            const enteredValue = inputElement.value;
 
-        .then((response) =>{
-                return response.json()
-            })
+            fetch(url,
+                {
+                    method: 'POST',
+                    headers: {'Content-Type': '/application/json', 'X-CSRFToken':csrftoken,},
+                    body:JSON.stringify({'ref': userData, address: enteredValue})
+                }
+            )
 
-        .then((data) =>{
-                console.log('Success:', data);
-                window.location.href = '/products/'
-            })
+            .then((response) =>{
+                    return response.json()
+                })
 
-      //console.log(message);
+            .then((data) =>{
+                    console.log('Success:', data);
+                    //window.location.href = '/'
+                    if (data.redirect) { // Check for 'redirect' key in response
+                    window.location.href = data.redirect; // Redirect using client-side JavaScript
+                  }
+
+                })
+
+          //console.log(message);
+        }
+      });
+
+      handler.openIframe();
     }
-  });
-
-  handler.openIframe();
-}
 </script>
-<style>
-.row-imagek {
-    height: 80px;
-    width: 80px;
-}
-@media only screen and (max-width: 1000px) {
-.row-imagek {
-    height: 100%;
-    width: 100%;
-}
-@media (min-width: 48em) {
-.line {
-    margin-top: 20px;
-}
-}
-.line {
-    margin-top: 1px;
-}
-@media only screen and (max-width: 700px) {
-.d{
-    display:none
-}
-}
-</style>
 
 {% endblock %}
