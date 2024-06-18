@@ -1,6 +1,8 @@
 import decimal
 import json
 from statistics import mean
+
+import requests
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Max, Q
 from django.http import JsonResponse

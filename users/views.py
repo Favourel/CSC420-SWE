@@ -77,3 +77,19 @@ def user_orders(request):
 
 def offline(request):
     return render(request, "users/offline.html")
+
+
+def error_404(request, exception):
+    data = {}
+    return render(request, 'users/error404.html', data)
+
+
+# def error_500(request):
+#     data = {}
+#     return render(request, 'users/error404.html', data)
+#
+#
+# def error_400(request, exception):
+#     data = {}
+#     return render(request, 'users/error404.html', data)
+

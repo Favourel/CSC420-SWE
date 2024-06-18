@@ -10,9 +10,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="icon" href="{% static 'images/falcon_LGfm6ox.png' %}">
-    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="https://cdn.ayroui.com/1.0/css/tiny-slider.css"/>
-    <script src="{% static 'js/reconnecting-websocket.js' %}"></script>
 
 
     <!-- Bootstrap CSS -->
@@ -91,12 +89,12 @@ $(document).ready(function(){
         font-weight: 400;
         font-size: 13px;
         margin: 0 0 10px 0;
-        background: #dfd url(../images/icon-yes.svg) 40px 12px no-repeat;
+        background: #dfd url('{% static 'images/icon-yes.svg' %}') 40px 12px no-repeat;
         background-size: 16px auto;
         color: #333;
     }
     .alert-warning {
-        background: #ffc url(../images/icon-alert.svg) 40px 14px no-repeat;
+        background: #ffc url('{% static 'images/icon-alert.svg' %}') 40px 14px no-repeat;
         background-size: 14px auto;
         color: #333;
         display: block;
@@ -106,7 +104,7 @@ $(document).ready(function(){
     }
 
     .alert-error {
-        background: #e81922 url(../images/icon-no.svg) 40px 12px no-repeat;
+        background: #e81922 url('{% static 'images/icon-no.svg' %}') 40px 12px no-repeat;
         background-size: 16px auto;
         color: #fff;
         display: block;
